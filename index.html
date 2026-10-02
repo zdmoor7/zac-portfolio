@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zac de Moor | Technical Storyteller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:      #9A6B3F;
+      --accent-deep: #7A5230;
+      --ink:         #1A120A;
+      --ink-mid:     #2C1E10;
+      --muted:       #7A6855;
+      --paper:       #F4EFE6;
+      --paper-dark:  #EAE2D5;
+      --cream:       #FDFAF5;
+      --night:       #1C1208;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* hide default cursor on desktop */
+    @media (hover: hover) and (pointer: fine) {
+      body, a, button { cursor: none !important; }
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── custom cursor ── */
+    #cursor-dot {
+      position: fixed;
+      top: 0; left: 0;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+      mix-blend-mode: multiply;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      top: 0; left: 0;
+      width: 38px; height: 38px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      opacity: 0.55;
+      transition: width 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  height 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  opacity 0.3s ease,
+                  border-color 0.3s ease;
+    }
+
+    body.cursor-hover #cursor-dot {
+      width: 14px; height: 14px;
+      background: var(--accent-deep);
+    }
+
+    body.cursor-hover #cursor-ring {
+      width: 56px; height: 56px;
+      opacity: 0.3;
+      border-color: var(--accent-deep);
+    }
+
+    body.cursor-hover-dark #cursor-dot {
+      width: 14px; height: 14px;
+      background: var(--paper);
+    }
+
+    body.cursor-hover-dark #cursor-ring {
+      width: 56px; height: 56px;
+      opacity: 0.4;
+      border-color: var(--paper);
+    }
+
+    /* ── particle canvas ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── everything above canvas ── */
+    .accent-bar {
+      height: 1.5rem;
+      background: var(--accent);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 2.5rem));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── nav ── */
+    .nav {
+      position: sticky;
+      top: 1.5rem;
+      z-index: 40;
+      padding: 1.25rem 0 0.5rem;
+      background: transparent;
+      transition: background 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .nav .shell {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1.5rem;
+      width: 3.35rem;
+      height: 3.35rem;
+      flex-shrink: 0;
+      background: var(--cream);
+      color: var(--ink);
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      flex: 1;
+    }
+
+    .nav-links a {
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: var(--ink);
+      background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent) 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 0.22em;
+      background-position: 0 88%;
+      padding: 0 0.2rem;
+      transition: background-size 0.2s ease;
+    }
+
+    .nav-links a:hover { background-size: 100% 88%; }
+
+    .nav-contact {
+      margin-left: auto;
+      font-weight: 800;
+      font-size: 1.45rem;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      padding: 0.35rem 0.9rem;
+      background: var(--cream);
+      color: var(--ink);
+      display: inline-block;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .nav-contact:hover {
+      background: var(--ink);
+      color: var(--cream);
+      box-shadow: 0 6px 20px rgba(26,18,10,0.2);
+    }
+
+    .menu-btn {
+      display: none;
+      margin-left: auto;
+      border: 0;
+      background: var(--paper-dark);
+      width: 3rem; height: 3rem;
+      border-radius: 999px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .nav.stuck {
+      background: rgba(122, 82, 48, 0.97);
+      padding: 0.85rem 0;
+      box-shadow: 0 8px 24px rgba(26,18,10,0.18);
+    }
+
+    .nav.stuck .logo { border-color: var(--cream); color: var(--cream); background: transparent; }
+    .nav.stuck .nav-links a { color: var(--cream); }
+    .nav.stuck .nav-contact { border-color: var(--cream); color: var(--cream); background: transparent; }
+    .nav.stuck .nav-contact:hover { background: var(--cream); color: var(--ink); }
+    .nav.stuck .menu-btn { background: rgba(255,255,255,0.15); color: var(--cream); }
+
+    /* ── hero ── */
+    .hero {
+      padding: 3.5rem 0 5rem;
+      text-align: center;
+    }
+
+    .portrait {
+      width: min(22rem, 78vw);
+      height: min(22rem, 78vw);
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: 50% 12%;
+      border: 8px solid var(--ink);
+      box-shadow: 0 10px 24px rgba(26,18,10,0.18);
+      transition: border-color 0.3s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+    }
+
+    .portrait:hover {
+      border-color: var(--accent);
+      transform: scale(1.04);
+      box-shadow: 0 20px 48px rgba(154,107,63,0.25);
+    }
+
+    .hero h1 {
+      margin: 3rem auto 0;
+      max-width: 42rem;
+      font-size: clamp(2rem, 4.6vw, 3.35rem);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      text-align: left;
+      padding: 0 0.5rem;
+    }
+
+    .hero h1 .name { color: var(--accent); }
+
+    .lede {
+      margin: 1.25rem auto 0;
+      max-width: 38rem;
+      text-align: left;
+      padding: 0 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .hero-links {
+      margin: 2rem auto 0;
+      max-width: 38rem;
+      text-align: left;
+      padding: 0 0.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* magnetic targets - transform applied by JS */
+    .magnet {
+      display: inline-block;
+      font-weight: 800;
+      font-size: 1rem;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      background: var(--cream);
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      will-change: transform;
+    }
+
+    .magnet:hover {
+      background: var(--ink);
+      color: var(--cream);
+      box-shadow: 0 8px 24px rgba(26,18,10,0.18);
+    }
+
+    /* ── sections ── */
+    section { padding: 4.5rem 0 5.5rem; }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+
+    .section-title .title-inner {
+      display: block;
+      transform: translateY(100%);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .on-scroll.visible .section-title .title-inner {
+      transform: translateY(0);
+    }
+
+    /* ── prep expander ── */
+    .prep-wrap {
+      background: var(--paper);
+      padding: 0 0 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .prep-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      text-align: left;
+    }
+
+    .prep-btn-circle {
+      flex-shrink: 0;
+      width: 3.2rem; height: 3.2rem;
+      border-radius: 50%;
+      border: 4px solid var(--ink);
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      transition: background 0.2s, color 0.2s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+      color: var(--ink);
+    }
+
+    .prep-btn:hover .prep-btn-circle {
+      box-shadow: 0 6px 18px rgba(154,107,63,0.2);
+      transform: scale(1.1);
+    }
+
+    .prep-btn[aria-expanded="true"] .prep-btn-circle {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--cream);
+      transform: rotate(45deg) scale(1.05);
+    }
+
+    .prep-btn-label {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      max-width: 36rem;
+    }
+
+    .prep-panel {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s ease;
+    }
+
+    .prep-panel.open { grid-template-rows: 1fr; }
+    .prep-panel-inner { overflow: hidden; }
+
+    .prep-content {
+      margin-top: 1.75rem;
+      padding: 1.75rem 2rem;
+      border: 4px solid var(--ink);
+      border-radius: 12px;
+      background: var(--cream);
+      max-width: 52rem;
+    }
+
+    .prep-content p {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      font-weight: 500;
+      line-height: 1.7;
+      color: var(--ink-mid);
+    }
+
+    .prep-content ul {
+      margin-top: 1rem;
+      padding-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .prep-content li {
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    .prep-content li span { font-weight: 500; color: var(--ink-mid); }
+
+    /* ── background ── */
+    .background { background: var(--paper-dark); }
+
+    .background p {
+      font-size: clamp(1.25rem, 2.4vw, 1.85rem);
+      font-weight: 800;
+      line-height: 1.4;
+      max-width: 52rem;
+      color: var(--ink-mid);
+    }
+
+    .background p + p { margin-top: 1.1rem; }
+
+    /* ── value video ── */
+    .value-video { background: var(--paper); }
+    .value-video .section-title { text-align: center; }
+
+    .video-outer {
+      max-width: 800px;
+      margin: 2rem auto 0;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--night);
+      box-shadow: 0 12px 32px rgba(26,18,10,0.2);
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease;
+    }
+
+    .video-container:hover {
+      transform: scale(1.018);
+      box-shadow: 0 24px 56px rgba(26,18,10,0.28);
+    }
+
+    .video-container iframe,
+    .video-container video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--paper-dark);
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .video-placeholder .play-icon {
+      width: 5rem; height: 5rem;
+      border-radius: 50%;
+      border: 4px solid rgba(244,239,230,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      opacity: 0.45;
+    }
+
+    .video-placeholder p {
+      font-weight: 700;
+      font-size: 1rem;
+      opacity: 0.35;
+    }
+
+    /* ── demos ── */
+    .demos { background: var(--night); color: var(--cream); }
+    .demos .section-title { text-align: center; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (min-width: 700px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .card {
+      background: var(--cream);
+      color: var(--ink);
+      border-radius: 1.15rem;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      border: 3px solid transparent;
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.35s ease,
+                  border-color 0.3s ease;
+      will-change: transform;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 28px 60px rgba(0,0,0,0.4);
+      border-color: var(--accent);
+    }
+
+    .card-visual { height: 11.5rem; position: relative; overflow: hidden; }
+    .card-visual.one { background: linear-gradient(135deg, #D4B896, #9A6B3F); }
+    .card-visual.two { background: linear-gradient(135deg, #C8B89A, #7A5230); }
+
+    /* shimmer on card visual */
+    .card-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .card:hover .card-visual::after {
+      transform: translateX(100%);
+    }
+
+    .card-body {
+      padding: 1.35rem 1.2rem 1.5rem;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper-dark);
+    }
+
+    .card h3 { font-size: 1.55rem; font-weight: 800; }
+
+    .card p {
+      margin: 0.55rem 0 1.1rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .btn {
+      margin-top: auto;
+      align-self: center;
+      display: inline-block;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      padding: 0.4rem 0.85rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: transparent;
+      color: var(--ink);
+      will-change: transform;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--ink);
+      color: var(--cream);
+      box-shadow: 0 6px 18px rgba(26,18,10,0.22);
+    }
+
+    /* ── recommendations ── */
+    .recommendations { background: var(--paper); }
+
+    .quotes {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 800px) {
+      .quotes { grid-template-columns: 1fr 1fr; gap: 1.75rem; }
+    }
+
+    blockquote {
+      border: 4px solid var(--ink);
+      border-radius: 12px;
+      padding: 1.6rem 1.5rem;
+      background: var(--cream);
+      box-shadow: 0 8px 18px rgba(26,18,10,0.07);
+      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.35s ease,
+                  border-color 0.3s ease;
+    }
+
+    blockquote:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 22px 48px rgba(26,18,10,0.13);
+      border-color: var(--accent);
+    }
+
+    blockquote p {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+
+    blockquote footer {
+      margin-top: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    blockquote cite {
+      display: block;
+      font-style: normal;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .quote-featured { grid-column: 1 / -1; }
+    .quote-featured blockquote p { font-size: 1.35rem; }
+
+    /* ── contact ── */
+    .contact { background: var(--paper-dark); }
+
+    .contact p {
+      font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+      font-weight: 800;
+      max-width: 32ch;
+      line-height: 1.4;
+    }
+
+    .contact a {
+      color: var(--accent-deep);
+      background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent) 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 0.22em;
+      background-position: 0 88%;
+      transition: background-size 0.2s ease;
+    }
+
+    .contact a:hover { background-size: 100% 88%; }
+
+    /* ── footer ── */
+    .site-foot {
+      border-top: 4px solid var(--ink);
+      padding: 1.5rem 0 2.5rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--paper);
+    }
+
+    /* ── mobile nav ── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--paper);
+      z-index: 60;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .mobile-nav.open { display: block; }
+
+    .mobile-nav .close {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      border: 0;
+      background: none;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .mobile-nav a, .mobile-nav .nav-contact {
+      display: block;
+      margin: 1.4rem auto;
+      font-size: 2rem;
+      font-weight: 800;
+      width: max-content;
+      color: var(--ink);
+    }
+
+    /* ── scroll animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.12s; }
+    .delay-2 { animation-delay: 0.28s; }
+    .delay-3 { animation-delay: 0.4s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: none; }
+    }
+
+    .on-scroll {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .on-scroll.visible { opacity: 1; transform: none; }
+
+    /* staggered children in demos section */
+    .on-scroll .card {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .on-scroll.visible .card:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.1s; }
+    .on-scroll.visible .card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.25s; }
+
+    .on-scroll blockquote {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.35s ease, border-color 0.3s ease;
+    }
+
+    .on-scroll.visible blockquote:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.05s; }
+    .on-scroll.visible blockquote:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.15s; }
+    .on-scroll.visible blockquote:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.25s; }
+    .on-scroll.visible .quote-featured blockquote { opacity: 1; transform: none; transition-delay: 0.35s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal, .on-scroll { opacity: 1; transform: none; animation: none; transition: none; }
+      .on-scroll .card, .on-scroll blockquote { opacity: 1; transform: none; }
+      #particle-canvas, #cursor-dot, #cursor-ring { display: none; }
+    }
+
+    @media (max-width: 800px) {
+      .nav-links, .nav-contact { display: none; }
+      .menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+      .hero h1, .lede, .hero-links { text-align: center; margin-left: auto; margin-right: auto; }
+      .hero-links { justify-content: center; }
+      .hero { padding-top: 2rem; }
+      .quote-featured { grid-column: 1; }
+      #cursor-dot, #cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- custom cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- particle canvas -->
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <div class="accent-bar"></div>
+
+  <header class="nav" id="nav">
+    <div class="shell">
+      <a class="logo" href="#top">Z</a>
+      <div class="nav-links">
+        <a href="#background">Background</a>
+        <a href="#demos">Demos</a>
+        <a href="#recommendations">Notes</a>
+      </div>
+      <a class="nav-contact magnet" href="#contact">Contact Me</a>
+      <button class="menu-btn" type="button" aria-label="Open menu" id="open-menu">☰</button>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <button class="close" type="button" id="close-menu" aria-label="Close menu">✕</button>
+    <a class="logo" href="#top" style="margin: 2rem auto;">Z</a>
+    <a href="#background">Background</a>
+    <a href="#demos">Demos</a>
+    <a href="#recommendations">Notes</a>
+    <a class="nav-contact" href="#contact">Contact Me</a>
+  </div>
+
+  <main id="top">
+
+    <section class="hero shell">
+      <img class="portrait reveal" src="headshot.jpg" alt="Zac de Moor">
+      <h1 class="reveal delay-1">Hey, I'm <span class="name">Zac</span>, a medical writer turned solutions engineer.</h1>
+      <p class="lede reveal delay-2">I’ve spent my career translating complexity through the written word, and now I’m doing it through the demo.</p>
+      <div class="hero-links reveal delay-3">
+        <a class="magnet" href="https://www.linkedin.com/in/zac-de-moor-743189251/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="magnet" href="#demos">See my work ↓</a>
+      </div>
+    </section>
+
+    <div class="prep-wrap">
+      <div class="shell">
+        <button class="prep-btn" id="prep-btn" aria-expanded="false" aria-controls="prep-panel">
+          <span class="prep-btn-circle" aria-hidden="true">+</span>
+          <span class="prep-btn-label">How have I prepared myself to be a great SE during my transition?</span>
+        </button>
+        <div class="prep-panel" id="prep-panel" role="region">
+          <div class="prep-panel-inner">
+            <div class="prep-content">
+              <p>I left medical writing ten months ago, and in that time I also moved to America and got married. In addition to those small changes, I</p>
+              <ul>
+                <li>Spoke with <span>over 45 SEs, senior SEs, and SE leaders</span> to build a clear, ground-level picture of the role</li>
+                <li>Completed <span>20+ dry-run demos</span> with senior SEs and leaders from Slack, Salesforce, Zoom, Microsoft, and Adobe</li>
+                <li>Built an <span>AI-powered MEDDIC Discovery Tool</span> using Flask, the Anthropic API, and a vector database. This is one of the demos I dry-ran, and you can watch it below</li>
+                <li>Earned a <span>Demo2Win certification</span></li>
+                <li>Completed courses in <span>APIs and cloud architecture</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="background" class="background on-scroll">
+      <div class="shell">
+        <h2 class="section-title"><span class="title-inner">Background</span></h2>
+        <p>I started as a medical writer in late 2022, creating congress content and medical education and organizing symposia for clients like AstraZeneca and Eli Lilly.</p>
+        <p>I enjoyed the writing, but what I enjoyed most was the client conversations: understanding the problem first, then shaping content that communicated complex science with precision and care.</p>
+        <p>The limit of writing is that you craft the message but aren't in the room when it lands.</p>
+        <p>Solutions Engineering keeps the craft of communicating complexity and puts me in the room to deliver it, drawing on technical depth, listening first, then telling the story that fits what I heard, live, with a customer.</p>
+        <p>To prepare, I built an AI discovery tool and have run dozens of mock calls and demos with experienced SE leaders. I'm ready to deliver value in a live role.</p>
+      </div>
+    </section>
+
+    <section id="video" class="value-video on-scroll">
+      <div class="shell">
+        <h2 class="section-title"><span class="title-inner">Want to hear a story?</span></h2>
+        <div class="video-outer">
+          <div class="video-container">
+            <!--
+              Replace with your Loom or YouTube embed:
+              Loom:    <iframe src="https://www.loom.com/embed/YOUR_ID" allowfullscreen></iframe>
+              YouTube: <iframe src="https://www.youtube.com/embed/YOUR_ID" allowfullscreen></iframe>
+            -->
+            <div class="video-placeholder">
+              <div class="play-icon">▶</div>
+              <p>Video coming soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="demos" class="demos on-scroll">
+      <div class="shell">
+        <h2 class="section-title"><span class="title-inner">Demos</span></h2>
+        <div class="cards">
+          <article class="card">
+            <div class="card-visual one" aria-hidden="true"></div>
+            <div class="card-body">
+              <h3>MEDDIC Discovery Tool</h3>
+              <p>A Python-powered tool that structures sales discovery conversations around the MEDDIC framework. Built to sharpen how SE teams approach discovery.</p>
+              <a class="btn magnet" href="meddic.html">View Demo →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-visual two" aria-hidden="true"></div>
+            <div class="card-body">
+              <h3>Yoodli AI Demo</h3>
+              <p>A walkthrough of how AI communication coaching can be used to sharpen delivery, pacing, and presence.</p>
+              <a class="btn magnet" href="#contact">Coming Soon</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="recommendations" class="recommendations on-scroll">
+      <div class="shell">
+        <h2 class="section-title"><span class="title-inner">Recommendations</span></h2>
+        <div class="quotes">
+
+          <blockquote>
+            <p>"Zac is humble, inquisitive, hardworking, and dedicated, with an extremely expansive knowledge set. He has the ability to connect with anyone from all walks of life, building genuine relationships with ease. No matter the discipline or domain Zac applies himself to, he excels and brings everyone along the journey with him. Give him a runway and watch what he can accomplish."</p>
+            <footer>
+              <cite>Oliver Bakhtiari</cite>
+              Senior Software Engineer, Cleary Gottlieb Steen &amp; Hamilton
+            </footer>
+          </blockquote>
+
+          <blockquote>
+            <p>"Zac has a gift for technical storytelling. His ability to adapt complex pharmaceutical content for very different audiences — from patients to specialist HCPs — and simplify complex information will make him a good sales engineer naturally."</p>
+            <footer>
+              <cite>Grace Vetch</cite>
+              Senior Medical Writer, Indigo Medical
+            </footer>
+          </blockquote>
+
+          <blockquote>
+            <p>"Zac has a rare talent for turning complex technical information into clear, engaging content. His philosophical approach and creative thinking always brought fresh perspectives to every project. Above all, he possesses immense trustworthiness — he is an invaluable asset to any team."</p>
+            <footer>
+              <cite>Sharaz Luke</cite>
+              Commercial &amp; Strategy Director (direct manager)
+            </footer>
+          </blockquote>
+
+          <div class="quote-featured">
+            <blockquote>
+              <p>"In my work recruiting presales talent for startups, I look for people who can hold complexity without losing clarity — those who can take something technically dense and make it resonate in a room of varied interests and motivations. Zac does this naturally through a habit of careful thinking and years of writing, but what makes it especially relevant for SE roles is that it's paired with a rare adaptability. Any team that values a rigorous, thoughtful, customer-facing communicator who will understand the problem before proposing a solution would be lucky to have him."</p>
+              <footer>
+                <cite>Juliana de Moor</cite>
+                Director of Sales &amp; Solutions Recruiting, Early-Stage &amp; Growth-Stage Tech
+              </footer>
+            </blockquote>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact on-scroll">
+      <div class="shell">
+        <h2 class="section-title"><span class="title-inner">Contact</span></h2>
+        <p><a href="mailto:zdmoor7@gmail.com">zdmoor7@gmail.com</a></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-foot">
+    <div class="shell">© Zac de Moor, technical storyteller.</div>
+  </footer>
+
+  <script>
+  (function () {
+
+    var isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+    /* ── custom cursor ── */
+    if (!isTouch) {
+      var dot  = document.getElementById('cursor-dot');
+      var ring = document.getElementById('cursor-ring');
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      var rx = mx, ry = my;
+
+      document.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px';
+        dot.style.top  = my + 'px';
+      }, { passive: true });
+
+      function lerpN(a, b, t) { return a + (b - a) * t; }
+
+      function tickCursor() {
+        rx = lerpN(rx, mx, 0.1);
+        ry = lerpN(ry, my, 0.1);
+        ring.style.left = rx.toFixed(1) + 'px';
+        ring.style.top  = ry.toFixed(1) + 'px';
+        requestAnimationFrame(tickCursor);
+      }
+      tickCursor();
+
+      /* cursor state on hover */
+      document.querySelectorAll('a, button, .card, blockquote, .portrait').forEach(function (el) {
+        var dark = el.closest('.demos') !== null;
+        el.addEventListener('mouseenter', function () {
+          document.body.classList.add(dark ? 'cursor-hover-dark' : 'cursor-hover');
+        });
+        el.addEventListener('mouseleave', function () {
+          document.body.classList.remove('cursor-hover', 'cursor-hover-dark');
+        });
+      });
+    }
+
+    /* ── particle constellation ── */
+    var canvas = document.getElementById('particle-canvas');
+    var ctx = canvas.getContext('2d');
+    var W, H;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    var COUNT = 120;
+    var LINK  = 160;
+    var particles = [];
+
+    for (var i = 0; i < COUNT; i++) {
+      particles.push({
+        x:  Math.random() * window.innerWidth,
+        y:  Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r:  Math.random() * 2.5 + 1.0,
+      });
+    }
+
+    var pmx = -9999, pmy = -9999;
+    window.addEventListener('mousemove', function (e) {
+      pmx = e.clientX; pmy = e.clientY;
+    }, { passive: true });
+
+    /* dark sections (light particles) vs light sections (dark particles) */
+    var darkSections = [];
+    function rebuildSectionMap() {
+      darkSections = [];
+      document.querySelectorAll('.demos, .problem').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        darkSections.push({ top: r.top + window.scrollY, bot: r.bottom + window.scrollY });
+      });
+    }
+    rebuildSectionMap();
+    window.addEventListener('scroll', rebuildSectionMap, { passive: true });
+    window.addEventListener('resize', rebuildSectionMap, { passive: true });
+
+    function isDarkAt(absY) {
+      for (var k = 0; k < darkSections.length; k++) {
+        if (absY >= darkSections[k].top && absY <= darkSections[k].bot) return true;
+      }
+      return false;
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, W, H);
+      var scrollY = window.scrollY;
+
+      for (var i = 0; i < COUNT; i++) {
+        var p = particles[i];
+
+        /* mouse repulsion */
+        var ddx = p.x - pmx, ddy = p.y - pmy;
+        var dd  = Math.sqrt(ddx * ddx + ddy * ddy);
+        if (dd < 120 && dd > 0) {
+          var f = (120 - dd) / 120 * 1.1;
+          p.vx += (ddx / dd) * f;
+          p.vy += (ddy / dd) * f;
+        }
+
+        /* dampen + move */
+        p.vx *= 0.975; p.vy *= 0.975;
+        p.x += p.vx;   p.y += p.vy;
+
+        /* wrap */
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+        /* pick colour based on background behind particle */
+        var dark = isDarkAt(p.y + scrollY);
+        var dotRGB  = dark ? '253,250,245' : '26,18,10';
+        var lineRGB = dark ? '253,250,245' : '26,18,10';
+        var dotOp   = dark ? 0.55 : 0.45;
+
+        /* dot */
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + dotRGB + ',' + dotOp + ')';
+        ctx.fill();
+
+        /* lines to neighbours */
+        for (var j = i + 1; j < COUNT; j++) {
+          var q = particles[j];
+          var dx = p.x - q.x, dy = p.y - q.y;
+          var d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < LINK) {
+            var alpha = (1 - d / LINK) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = 'rgba(' + lineRGB + ',' + alpha + ')';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    /* ── magnetic buttons ── */
+    if (!isTouch) {
+      document.querySelectorAll('.magnet').forEach(function (el) {
+        el.addEventListener('mousemove', function (e) {
+          var rect = el.getBoundingClientRect();
+          var cx = rect.left + rect.width  / 2;
+          var cy = rect.top  + rect.height / 2;
+          var dx = (e.clientX - cx) * 0.38;
+          var dy = (e.clientY - cy) * 0.38;
+          el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        });
+        el.addEventListener('mouseleave', function () {
+          el.style.transform = '';
+        });
+      });
+    }
+
+    /* ── sticky nav ── */
+    var nav = document.getElementById('nav');
+    function onScroll() { nav.classList.toggle('stuck', window.scrollY > 80); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* ── prep expander ── */
+    var prepBtn   = document.getElementById('prep-btn');
+    var prepPanel = document.getElementById('prep-panel');
+    prepBtn.addEventListener('click', function () {
+      var expanded = prepBtn.getAttribute('aria-expanded') === 'true';
+      prepBtn.setAttribute('aria-expanded', String(!expanded));
+      prepPanel.classList.toggle('open', !expanded);
+    });
+
+    /* ── mobile nav ── */
+    var mobile = document.getElementById('mobile-nav');
+    function closeMenu() { mobile.classList.remove('open'); }
+    document.getElementById('open-menu').addEventListener('click', function () { mobile.classList.add('open'); });
+    document.getElementById('close-menu').addEventListener('click', closeMenu);
+    mobile.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+
+    /* ── scroll reveal ── */
+    var nodes = document.querySelectorAll('.on-scroll');
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      nodes.forEach(function (el) { obs.observe(el); });
+    } else {
+      nodes.forEach(function (el) { el.classList.add('visible'); });
+    }
+
+  })();
+  </script>
+</body>
+</html>

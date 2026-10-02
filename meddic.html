@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDDIC Discovery Tool | Zac de Moor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:      #9A6B3F;
+      --accent-deep: #7A5230;
+      --ink:         #1A120A;
+      --ink-mid:     #2C1E10;
+      --muted:       #7A6855;
+      --paper:       #F4EFE6;
+      --paper-dark:  #EAE2D5;
+      --cream:       #FDFAF5;
+      --night:       #1C1208;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .accent-bar {
+      height: 1.5rem;
+      background: var(--accent);
+    }
+
+    .shell {
+      width: min(860px, calc(100% - 2.5rem));
+      margin: 0 auto;
+    }
+
+    /* ── top strip ── */
+    .top-strip {
+      padding: 1.25rem 0;
+      border-bottom: 3px solid var(--ink);
+      background: var(--cream);
+    }
+
+    .top-strip .shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .back-link {
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+
+    .byline {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* ── hero ── */
+    .hero {
+      padding: 4rem 0 3rem;
+      text-align: left;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      max-width: 26ch;
+    }
+
+    .hero-sub {
+      margin-top: 1rem;
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 54ch;
+    }
+
+    /* ── video ── */
+    .video-wrap {
+      padding: 0 0 4rem;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--night);
+      box-shadow: 0 12px 32px rgba(26,18,10,0.2);
+    }
+
+    .video-container iframe,
+    .video-container video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--paper-dark);
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .video-placeholder .play-icon {
+      width: 5rem;
+      height: 5rem;
+      border-radius: 50%;
+      border: 4px solid var(--paper-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      opacity: 0.6;
+    }
+
+    .video-placeholder p {
+      font-weight: 700;
+      font-size: 1rem;
+      opacity: 0.5;
+    }
+
+    /* ── divider ── */
+    .divider {
+      border: 0;
+      border-top: 3px solid var(--ink);
+      margin: 0;
+    }
+
+    /* ── the problem ── */
+    .problem {
+      padding: 4rem 0;
+      background: var(--night);
+      color: var(--cream);
+    }
+
+    .problem .section-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .problem h2 {
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      max-width: 28ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .problem p {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      font-weight: 500;
+      line-height: 1.7;
+      color: rgba(253,250,245,0.75);
+      max-width: 58ch;
+    }
+
+    .problem p + p { margin-top: 1rem; }
+
+    /* ── the build ── */
+    .build {
+      padding: 4.5rem 0;
+      background: var(--paper-dark);
+    }
+
+    .build .section-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .build h2 {
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 1.5rem;
+    }
+
+    .build p {
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      font-weight: 500;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      max-width: 60ch;
+    }
+
+    .build p + p { margin-top: 1rem; }
+
+    /* ── stack ── */
+    .stack {
+      padding: 4.5rem 0;
+      background: var(--cream);
+    }
+
+    .stack .section-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .stack h2 {
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .stack-item {
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      padding: 1.25rem 1.1rem;
+      background: var(--paper);
+    }
+
+    .stack-item .tech {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    .stack-item .role {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── footer ── */
+    .site-foot {
+      border-top: 4px solid var(--ink);
+      padding: 1.5rem 0 2.5rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--paper);
+    }
+
+    .site-foot .shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .site-foot a {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* ── particle canvas ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: multiply;
+    }
+
+    /* everything above canvas needs z-index */
+    .accent-bar, .top-strip, main, footer { position: relative; z-index: 1; }
+
+    /* ── animations ── */
+    .on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .on-scroll.visible { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .on-scroll { opacity: 1; transform: none; transition: none; }
+      #particle-canvas { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <div class="accent-bar"></div>
+
+  <div class="top-strip">
+    <div class="shell">
+      <a class="back-link" href="index.html">← Zac de Moor</a>
+      <span class="byline">SE Portfolio</span>
+    </div>
+  </div>
+
+  <main>
+
+    <section class="hero">
+      <div class="shell">
+        <span class="tag">Capstone Project</span>
+        <h1>MEDDIC Discovery Tool</h1>
+        <p class="hero-sub">An AI discovery assistant that turns a call transcript into structured MEDDIC notes, a recommended demo, and competitive context, so SEs spend less time writing up calls and more time preparing for the next one.</p>
+      </div>
+    </section>
+
+    <div class="video-wrap">
+      <div class="shell">
+        <div class="video-container">
+          <!--
+            Replace this placeholder with your video embed.
+            Loom:    <iframe src="https://www.loom.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+            YouTube: <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+            Local:   <video src="demo.mp4" controls></video>
+          -->
+          <div class="video-placeholder">
+            <div class="play-icon">▶</div>
+            <p>Demo video coming soon</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <section class="problem on-scroll">
+      <div class="shell">
+        <span class="section-label">The Problem</span>
+        <h2>Discovery notes are a grind, but they shouldn't be.</h2>
+        <p>After a discovery call, SEs often spend time they don't have reconstructing what was said into MEDDIC signals and capturing what mattered so the deal can move forward.</p>
+        <p>That work is the cost of discovery, not the value of it. The value is understanding a customer's problem well enough to demo the right thing in a tailored, impactful way. This tool handles the reconstruction and goes a step further: it recommends what to demo and how to position against competitors, so the time saved goes straight into preparation.</p>
+      </div>
+    </section>
+
+    <section class="build on-scroll">
+      <div class="shell">
+        <span class="section-label">The Build</span>
+        <h2>12 weeks. A self-designed syllabus. One working tool.</h2>
+        <p>I built this over 12 weeks using a curriculum I designed myself, starting from first principles and working up to a deployable Flask application.</p>
+        <p>I started with Python fundamentals and data handling with SQL, then moved into how LLMs work and how to direct them with system prompts.</p>
+        <p>From there I configured the API integration using the Anthropic API, vector storage with ChromaDB to store past deals as historical context, and finally Flask to wrap it all into something usable.</p>
+        <p>The MEDDIC Discovery Tool is what came out the other side, and I’m pretty proud of it. You run a discovery call, feed the conversation in, and the tool structures the output against the MEDDIC framework: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion. That’s followed by a demo prescription and competitive context for differentiating the product.</p>
+        <p>It's a Flask application built on the Anthropic API, with system prompts that direct the analysis and ChromaDB storing past deals so the tool can pull from historical context to make the prescription more relevant.</p>
+        <p>After I demoed the tool to the head of healthcare solutions at Zoom, he said he'd want his SEs to challenge the recommendation and make it their own. That's what I’d suggest for implementation: a chat layer, scoped to the team's workflow, where SEs can challenge and refine the output until it's theirs.</p>
+      </div>
+    </section>
+
+    <section class="stack on-scroll">
+      <div class="shell">
+        <span class="section-label">Tech Stack</span>
+        <h2>What it's built with</h2>
+        <div class="stack-grid">
+          <div class="stack-item">
+            <span class="tech">Python</span>
+            <span class="role">Core language and application logic</span>
+          </div>
+          <div class="stack-item">
+            <span class="tech">Flask</span>
+            <span class="role">Web framework to serve the tool as an app</span>
+          </div>
+          <div class="stack-item">
+            <span class="tech">Anthropic API</span>
+            <span class="role">LLM backbone for discovery analysis</span>
+          </div>
+          <div class="stack-item">
+            <span class="tech">System Prompts</span>
+            <span class="role">Structured instructions to direct model output</span>
+          </div>
+          <div class="stack-item">
+            <span class="tech">ChromaDB</span>
+            <span class="role">Vector storage of past deals for historical context</span>
+          </div>
+          <div class="stack-item">
+            <span class="tech">SQL</span>
+            <span class="role">Data querying and structured storage</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-foot">
+    <div class="shell">
+      <span>© Zac de Moor</span>
+      <a href="index.html">Back to portfolio →</a>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+
+    /* ── particle constellation ── */
+    var canvas = document.getElementById('particle-canvas');
+    var ctx = canvas.getContext('2d');
+    var W, H;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    var COUNT = 120;
+    var LINK  = 160;
+    var particles = [];
+
+    for (var i = 0; i < COUNT; i++) {
+      particles.push({
+        x:  Math.random() * window.innerWidth,
+        y:  Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r:  Math.random() * 2.5 + 1.0,
+      });
+    }
+
+    var pmx = -9999, pmy = -9999;
+    window.addEventListener('mousemove', function (e) {
+      pmx = e.clientX; pmy = e.clientY;
+    }, { passive: true });
+
+    /* dark sections (light particles) vs light sections (dark particles) */
+    var darkSections = [];
+    function rebuildSectionMap() {
+      darkSections = [];
+      document.querySelectorAll('.problem').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        darkSections.push({ top: r.top + window.scrollY, bot: r.bottom + window.scrollY });
+      });
+    }
+    rebuildSectionMap();
+    window.addEventListener('scroll', rebuildSectionMap, { passive: true });
+    window.addEventListener('resize', rebuildSectionMap, { passive: true });
+
+    function isDarkAt(absY) {
+      for (var k = 0; k < darkSections.length; k++) {
+        if (absY >= darkSections[k].top && absY <= darkSections[k].bot) return true;
+      }
+      return false;
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, W, H);
+      var scrollY = window.scrollY;
+
+      for (var i = 0; i < COUNT; i++) {
+        var p = particles[i];
+
+        var ddx = p.x - pmx, ddy = p.y - pmy;
+        var dd  = Math.sqrt(ddx * ddx + ddy * ddy);
+        if (dd < 120 && dd > 0) {
+          var f = (120 - dd) / 120 * 1.1;
+          p.vx += (ddx / dd) * f;
+          p.vy += (ddy / dd) * f;
+        }
+
+        p.vx *= 0.975; p.vy *= 0.975;
+        p.x += p.vx;   p.y += p.vy;
+
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+        var dark = isDarkAt(p.y + scrollY);
+        var dotRGB  = dark ? '253,250,245' : '26,18,10';
+        var lineRGB = dark ? '253,250,245' : '26,18,10';
+        var dotOp   = dark ? 0.55 : 0.45;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + dotRGB + ',' + dotOp + ')';
+        ctx.fill();
+
+        for (var j = i + 1; j < COUNT; j++) {
+          var q = particles[j];
+          var dx = p.x - q.x, dy = p.y - q.y;
+          var d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < LINK) {
+            var alpha = (1 - d / LINK) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = 'rgba(' + lineRGB + ',' + alpha + ')';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    /* ── scroll reveal ── */
+    var nodes = document.querySelectorAll(".on-scroll");
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach(function (el) { el.classList.add("visible"); });
+    } else {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+      nodes.forEach(function (el) { observer.observe(el); });
+    }
+
+  })();
+  </script>
+</body>
+</html>
