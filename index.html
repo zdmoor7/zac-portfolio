@@ -751,6 +751,31 @@
       .quote-featured { grid-column: 1; }
       #cursor-dot, #cursor-ring { display: none; }
     }
+
+    /* ── dark theme ── */
+    :root {
+      color-scheme: dark;
+      --accent:      #C8925C;
+      --accent-deep: #B88250;
+      --ink:         #F4EFE6;
+      --ink-mid:     #DDD2C2;
+      --muted:       #A8957F;
+      --paper:       #17110B;
+      --paper-dark:  #1F170F;
+      --cream:       #2A2016;
+      --night:       #0D0905;
+    }
+    #particle-canvas { mix-blend-mode: normal; }
+    .video-placeholder { color: var(--ink-mid); }
+    #cursor-dot { mix-blend-mode: normal; }
+    body.cursor-hover-dark #cursor-dot { background: var(--ink); }
+    body.cursor-hover-dark #cursor-ring { border-color: var(--ink); }
+    .demos { color: var(--ink); }
+    .nav.stuck .logo,
+    .nav.stuck .nav-links a,
+    .nav.stuck .nav-contact { color: #F4EFE6; border-color: #F4EFE6; }
+    .nav.stuck .nav-contact:hover { background: #F4EFE6; color: #17110B; }
+    .nav.stuck .menu-btn { color: #F4EFE6; }
   </style>
 </head>
 <body>
@@ -1048,7 +1073,7 @@
         if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
 
         /* pick colour based on background behind particle */
-        var dark = isDarkAt(p.y + scrollY);
+        var dark = true; /* dark theme: always light particles */
         var dotRGB  = dark ? '253,250,245' : '26,18,10';
         var lineRGB = dark ? '253,250,245' : '26,18,10';
         var dotOp   = dark ? 0.55 : 0.45;

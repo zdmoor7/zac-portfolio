@@ -337,9 +337,99 @@
       .on-scroll { opacity: 1; transform: none; transition: none; }
       #particle-canvas { display: none; }
     }
+
+    /* ── dark theme ── */
+    :root {
+      color-scheme: dark;
+      --accent:      #C8925C;
+      --accent-deep: #B88250;
+      --ink:         #F4EFE6;
+      --ink-mid:     #DDD2C2;
+      --muted:       #A8957F;
+      --paper:       #17110B;
+      --paper-dark:  #1F170F;
+      --cream:       #2A2016;
+      --night:       #0D0905;
+    }
+    #particle-canvas { mix-blend-mode: normal; }
+    .video-placeholder { color: var(--ink-mid); }
+    .video-placeholder .play-icon { border-color: rgba(244,239,230,0.35); }
+    .problem { color: var(--ink); }
+    /* hide default cursor on desktop */
+    @media (hover: hover) and (pointer: fine) {
+      body, a, button { cursor: none !important; }
+    }
+
+    /* ── custom cursor ── */
+    #cursor-dot {
+      position: fixed;
+      top: 0; left: 0;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+      mix-blend-mode: multiply;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      top: 0; left: 0;
+      width: 38px; height: 38px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      opacity: 0.55;
+      transition: width 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  height 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  opacity 0.3s ease,
+                  border-color 0.3s ease;
+    }
+
+    body.cursor-hover #cursor-dot {
+      width: 14px; height: 14px;
+      background: var(--accent-deep);
+    }
+
+    body.cursor-hover #cursor-ring {
+      width: 56px; height: 56px;
+      opacity: 0.3;
+      border-color: var(--accent-deep);
+    }
+
+    body.cursor-hover-dark #cursor-dot {
+      width: 14px; height: 14px;
+      background: var(--paper);
+    }
+
+    body.cursor-hover-dark #cursor-ring {
+      width: 56px; height: 56px;
+      opacity: 0.4;
+      border-color: var(--paper);
+    }
+    #cursor-dot { mix-blend-mode: normal; }
+    @media (prefers-reduced-motion: reduce), (max-width: 800px) {
+      #cursor-dot, #cursor-ring { display: none; }
+    }
+
+    /* translucent surfaces so particles show through */
+    .top-strip      { background: rgba(42,32,22,0.55); }
+    .video-container{ background: rgba(13,9,5,0.55); }
+    .problem        { background: rgba(13,9,5,0.5); }
+    .build          { background: rgba(31,23,15,0.45); }
+    .stack          { background: rgba(42,32,22,0.35); }
+    .stack-item     { background: rgba(23,17,11,0.45); }
+    .site-foot      { background: rgba(23,17,11,0.5); }
   </style>
 </head>
 <body>
+  <!-- custom cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
   <canvas id="particle-canvas" aria-hidden="true"></canvas>
 
   <div class="accent-bar"></div>
@@ -446,6 +536,41 @@
 
   <script>
   (function () {
+    /* ── custom cursor ── */
+    var isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isTouch) {
+      var dot  = document.getElementById('cursor-dot');
+      var ring = document.getElementById('cursor-ring');
+      var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      var rx = mx, ry = my;
+
+      document.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px';
+        dot.style.top  = my + 'px';
+      }, { passive: true });
+
+      function lerpN(a, b, t) { return a + (b - a) * t; }
+
+      function tickCursor() {
+        rx = lerpN(rx, mx, 0.1);
+        ry = lerpN(ry, my, 0.1);
+        ring.style.left = rx.toFixed(1) + 'px';
+        ring.style.top  = ry.toFixed(1) + 'px';
+        requestAnimationFrame(tickCursor);
+      }
+      tickCursor();
+
+      /* cursor state on hover */
+      document.querySelectorAll('a, button, .stack-item').forEach(function (el) {
+        el.addEventListener('mouseenter', function () { document.body.classList.add('cursor-hover'); });
+        el.addEventListener('mouseleave', function () { document.body.classList.remove('cursor-hover'); });
+      });
+    }
+  })();
+  </script>
+  <script>
+  (function () {
 
     /* ── particle constellation ── */
     var canvas = document.getElementById('particle-canvas');
@@ -519,7 +644,7 @@
         if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
         if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
 
-        var dark = isDarkAt(p.y + scrollY);
+        var dark = true; /* dark theme: always light particles */
         var dotRGB  = dark ? '253,250,245' : '26,18,10';
         var lineRGB = dark ? '253,250,245' : '26,18,10';
         var dotOp   = dark ? 0.55 : 0.45;
