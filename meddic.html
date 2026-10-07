@@ -450,7 +450,7 @@
       <div class="shell">
         <span class="tag">Capstone Project</span>
         <h1>MEDDIC Discovery Tool</h1>
-        <p class="hero-sub">An AI discovery assistant that turns a call transcript into structured MEDDIC notes, a recommended demo, and competitive context, so SEs spend less time writing up calls and more time preparing for the next one.</p>
+        <p class="hero-sub">An AI discovery assistant that turns a call transcript into structured MEDDIC notes, a red/yellow/green readiness check, a recommended demo agenda, and competitive context, so SEs spend less time writing up calls and more time preparing for the next one.</p>
       </div>
     </section>
 
@@ -477,7 +477,7 @@
       <div class="shell">
         <h2>The Problem</h2>
         <p>After a discovery call, SEs often spend time they don't have reconstructing what was said into MEDDIC signals and capturing what mattered so the deal can move forward.</p>
-        <p>That work is the cost of discovery, not the value of it. The value is understanding a customer's problem well enough to demo the right thing in a tailored, impactful way. This tool handles the reconstruction and goes a step further: it recommends what to demo and how to position against competitors, so the time saved goes straight into preparation.</p>
+        <p>That work is the cost of discovery, not the value of it. The value is understanding a customer's problem well enough to demo the right thing in a tailored, impactful way. This tool handles the reconstruction and goes a step further: it tells you whether you're ready to demo, recommends what to demo and how to position against competitors, so the time saved goes straight into preparation.</p>
       </div>
     </section>
 
@@ -486,10 +486,10 @@
         <h2>The Build</h2>
         <p>I built this over 12 weeks using a curriculum I designed myself, starting from first principles and working up to a deployable Flask application.</p>
         <p>I started with Python fundamentals and data handling with SQL, then moved into how LLMs work and how to direct them with system prompts.</p>
-        <p>From there I configured the API integration using the Anthropic API, vector storage with ChromaDB to store past deals as historical context, and finally Flask to wrap it all into something usable.</p>
-        <p>The MEDDIC Discovery Tool is what came out the other side, and I’m pretty proud of it. You run a discovery call, feed the conversation in, and the tool structures the output against the MEDDIC framework: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion. That’s followed by a demo prescription and competitive context for differentiating the product.</p>
-        <p>It's a Flask application built on the Anthropic API, with system prompts that direct the analysis and ChromaDB storing past deals so the tool can pull from historical context to make the prescription more relevant.</p>
-        <p>After I demoed the tool to the head of healthcare solutions at Zoom, he said he'd want his SEs to challenge the recommendation and make it their own. That's what I’d suggest for implementation: a chat layer, scoped to the team's workflow, where SEs can challenge and refine the output until it's theirs.</p>
+        <p>From there I configured the API integration using the Anthropic API, vector storage with ChromaDB to search the product documentation, and finally Flask to wrap it all into something usable.</p>
+        <p>The MEDDIC Discovery Tool is what came out the other side, and I’m pretty proud of it. You run a discovery call, feed the conversation in, and the tool structures the output against the MEDDIC framework: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion. Each element gets a red, yellow, or green status, and if anything critical is missing, the tool tells you you’re not ready to demo and what to ask next. It also measures how much of the call was discovery versus pitching. That’s followed by a recommended demo agenda, a demo prescription and competitive context for differentiating the product.</p>
+        <p>It's a Flask application built on the Anthropic API, with system prompts that direct the analysis and ChromaDB searching the product documentation so the prescription is built from what the product actually does.</p>
+        <p>After I demoed the tool to the head of healthcare solutions at Zoom, he said he'd want his SEs to challenge the recommendation and make it their own. So I built that in: a chat layer where SEs can challenge and refine the output until it's theirs, followed by a final check on whether they're ready to demo.</p>
       </div>
     </section>
 
@@ -516,7 +516,7 @@
           </div>
           <div class="stack-item">
             <span class="tech">ChromaDB</span>
-            <span class="role">Vector storage of past deals for historical context</span>
+            <span class="role">Vector search over product documentation</span>
           </div>
           <div class="stack-item">
             <span class="tech">SQL</span>

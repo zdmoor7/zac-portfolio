@@ -575,6 +575,127 @@
       box-shadow: 0 6px 18px rgba(26,18,10,0.22);
     }
 
+    /* ── quote lit by a stage spotlight, under the demo cards ── */
+    .spotlight {
+      position: relative;
+      margin: 3rem 0 0;
+      padding: 4.5rem 2rem 2.5rem;
+      text-align: center;
+      color: var(--ink);
+      border-radius: 1.15rem;
+      isolation: isolate;
+      /* pool of light where the beam lands */
+      background:
+        radial-gradient(ellipse 48% 44% at 50% 52%, rgba(255, 214, 160, 0.16), rgba(200, 146, 92, 0.07) 55%, transparent 100%);
+    }
+
+    /* the beam: narrow at the top, widening as it falls */
+    .spotlight::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      /* soft-edged cone pointing straight down from the lamp */
+      background: conic-gradient(from 157deg at 50% -4%,
+        transparent 0deg,
+        rgba(255, 228, 180, 0.20) 13deg,
+        rgba(255, 232, 190, 0.26) 23deg,
+        rgba(255, 228, 180, 0.20) 33deg,
+        transparent 46deg);
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.55) 55%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.55) 55%, transparent 100%);
+      opacity: 0;
+      transition: opacity 1.4s ease 0.8s;
+    }
+
+    /* the lamp glow at the source */
+    .spotlight::after {
+      content: '';
+      position: absolute;
+      top: -1.5rem;
+      left: 50%;
+      width: 9rem;
+      height: 3rem;
+      transform: translateX(-50%);
+      z-index: -1;
+      border-radius: 50%;
+      background: rgba(255, 236, 200, 0.55);
+      filter: blur(18px);
+      opacity: 0;
+      transition: opacity 1s ease 0.6s;
+    }
+
+    .on-scroll.visible .spotlight::before,
+    .on-scroll.visible .spotlight::after { opacity: 1; }
+
+    .spotlight blockquote {
+      margin: 0 auto;
+      padding: 0;
+      border: none;
+      background: none;
+      box-shadow: none;
+      max-width: 60ch;
+    }
+
+    .spotlight blockquote:hover { transform: none; box-shadow: none; }
+
+    .spotlight blockquote p {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      text-shadow: 0 0 24px rgba(255, 214, 160, 0.18);
+    }
+
+    .spotlight blockquote p + p { margin-top: 0.9rem; }
+
+    .spotlight mark {
+      background: none;
+      color: var(--accent);
+    }
+
+    .spotlight-foot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+
+    .spotlight figcaption { font-weight: 700; color: var(--muted); font-size: 0.95rem; }
+
+    .spotlight figcaption cite {
+      display: block;
+      font-style: normal;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+
+    .spotlight-cta {
+      margin-top: 0;
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .spotlight-cta:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .spotlight { padding: 3.5rem 1.25rem 2rem; }
+      .spotlight::before {
+        background: conic-gradient(from 163deg at 50% -4%,
+          transparent 0deg,
+          rgba(255, 228, 180, 0.20) 10deg,
+          rgba(255, 232, 190, 0.26) 17deg,
+          rgba(255, 228, 180, 0.20) 24deg,
+          transparent 34deg);
+      }
+    }
+
     /* ── recommendations ── */
     .recommendations { background: var(--paper); }
 
@@ -724,6 +845,14 @@
     .on-scroll.visible .card:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.1s; }
     .on-scroll.visible .card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.25s; }
 
+    .on-scroll .spotlight {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .on-scroll.visible .spotlight { opacity: 1; transform: none; transition-delay: 0.4s; }
+
     .on-scroll blockquote {
       opacity: 0;
       transform: translateY(24px);
@@ -738,7 +867,8 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .reveal, .on-scroll { opacity: 1; transform: none; animation: none; transition: none; }
-      .on-scroll .card, .on-scroll blockquote { opacity: 1; transform: none; }
+      .on-scroll .card, .on-scroll blockquote, .on-scroll .spotlight { opacity: 1; transform: none; }
+      .spotlight::before, .spotlight::after { opacity: 1; transition: none; }
       #particle-canvas, #cursor-dot, #cursor-ring { display: none; }
     }
 
@@ -884,7 +1014,7 @@
             <div class="card-visual one" aria-hidden="true"></div>
             <div class="card-body">
               <h3>MEDDIC Discovery Tool</h3>
-              <p>A Python-powered tool that structures sales discovery conversations around the MEDDIC framework. Built to sharpen how SE teams approach discovery.</p>
+              <p>A Python-powered tool that structures sales discovery conversations around the MEDDIC framework and tells SEs when they're ready to demo. Built to sharpen how SE teams approach discovery.</p>
               <a class="btn magnet" href="meddic.html">View Demo →</a>
             </div>
           </article>
@@ -897,6 +1027,20 @@
             </div>
           </article>
         </div>
+
+        <figure class="spotlight">
+          <blockquote>
+            <p>&ldquo;Insufficient discovery is the single biggest problem for many presales teams, leading to wasted demos, unnecessary POCs, losses to competition, and No Decision outcomes. This tool improves discovery effectiveness and resulting demo readiness in a structured approach leveraging MEDDIC. It enables presales to quickly understand, <mark>&lsquo;Am I ready to demo?&rsquo;</mark></p>
+            <p>What impressed me was that Zac didn't just demo a tool, he demonstrated the discovery-first thinking behind it. That mindset will be an asset to any strong presales team.&rdquo;</p>
+          </blockquote>
+          <div class="spotlight-foot">
+            <figcaption>
+              <cite>Peter E. Cohan</cite>
+              Founder of Great Demo!
+            </figcaption>
+            <a class="btn magnet spotlight-cta" href="meddic.html">See what Peter saw &rarr;</a>
+          </div>
+        </figure>
       </div>
     </section>
 
