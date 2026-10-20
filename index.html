@@ -489,11 +489,8 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-
-    @media (min-width: 700px) {
-      .cards { grid-template-columns: repeat(2, 1fr); }
+      max-width: 34rem;
+      margin: 2.5rem auto 0;
     }
 
     .card {
@@ -519,7 +516,6 @@
 
     .card-visual { height: 11.5rem; position: relative; overflow: hidden; }
     .card-visual.one { background: linear-gradient(135deg, #D4B896, #9A6B3F); }
-    .card-visual.two { background: linear-gradient(135deg, #C8B89A, #7A5230); }
 
     /* shimmer on card visual */
     .card-visual::after {
@@ -660,6 +656,22 @@
       align-items: center;
       gap: 1.25rem;
       margin-top: 1.75rem;
+    }
+
+    .spotlight-byline {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      text-align: left;
+    }
+
+    .spotlight-photo {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     }
 
     .spotlight figcaption { font-weight: 700; color: var(--muted); font-size: 0.95rem; }
@@ -843,7 +855,6 @@
     }
 
     .on-scroll.visible .card:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.1s; }
-    .on-scroll.visible .card:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.25s; }
 
     .on-scroll .spotlight {
       opacity: 0;
@@ -944,7 +955,7 @@
   <main id="top">
 
     <section class="hero shell">
-      <img class="portrait reveal" src="headshot.jpg" alt="Zac de Moor">
+      <img class="portrait reveal" src="headshot-tie.jpg" alt="Zac de Moor">
       <h1 class="reveal delay-1">Hey, I'm <span class="name">Zac</span>, a medical writer turned solutions engineer.</h1>
       <p class="lede reveal delay-2">I’ve spent my career translating complexity through the written word, and now I’m doing it through the demo.</p>
       <div class="hero-links reveal delay-3">
@@ -979,11 +990,11 @@
     <section id="background" class="background on-scroll">
       <div class="shell">
         <h2 class="section-title"><span class="title-inner">Background</span></h2>
-        <p>I started as a medical writer in late 2022, creating congress content and medical education and organizing symposia for clients like AstraZeneca and Eli Lilly.</p>
-        <p>I enjoyed the writing, but what I enjoyed most was the client conversations: understanding the problem first, then shaping content that communicated complex science with precision and care.</p>
-        <p>The limit of writing is that you craft the message but aren't in the room when it lands.</p>
-        <p>Solutions Engineering keeps the craft of communicating complexity and puts me in the room to deliver it, drawing on technical depth, listening first, then telling the story that fits what I heard, live, with a customer.</p>
-        <p>To prepare, I built an AI discovery tool and have run dozens of mock calls and demos with experienced SE leaders. I'm ready to deliver value in a live role.</p>
+        <p>I started as a medical writer in late 2022, creating congress content, medical education and organizing symposia for clients like AstraZeneca and Eli Lilly.</p>
+        <p>I enjoyed the writing, but what I enjoyed most was the client conversations, where I sought to understand the problem first, then craft content that communicated complex science with precision and care.</p>
+        <p>But the limit of writing for me was that I crafted the message but wasn't in the room to deliver it.</p>
+        <p>Solutions Engineering keeps the craft of communicating complexity but puts me in the room to communicate it live with the customer. A role where I can still draw on technical depth, curiosity first, and telling a story that addresses the client's problems. But in a way that draws on my natural gifts.</p>
+        <p>To prepare, I built a MEDDIC discovery tool, and have run dozens of mock discovery calls and demos with experienced SE leaders. Now I'm ready to put what I've learned into practice in a live role.</p>
       </div>
     </section>
 
@@ -1018,14 +1029,6 @@
               <a class="btn magnet" href="meddic.html">View Demo →</a>
             </div>
           </article>
-          <article class="card">
-            <div class="card-visual two" aria-hidden="true"></div>
-            <div class="card-body">
-              <h3>Yoodli AI Demo</h3>
-              <p>A walkthrough of how AI communication coaching can be used to sharpen delivery, pacing, and presence.</p>
-              <a class="btn magnet" href="#contact">Coming Soon</a>
-            </div>
-          </article>
         </div>
 
         <figure class="spotlight">
@@ -1034,10 +1037,13 @@
             <p>What impressed me was that Zac didn't just demo a tool, he demonstrated the discovery-first thinking behind it. That mindset will be an asset to any strong presales team.&rdquo;</p>
           </blockquote>
           <div class="spotlight-foot">
-            <figcaption>
-              <cite>Peter E. Cohan</cite>
-              Founder of Great Demo!
-            </figcaption>
+            <div class="spotlight-byline">
+              <img class="spotlight-photo" src="peter-cohan.jpg" alt="Peter E. Cohan">
+              <figcaption>
+                <cite>Peter E. Cohan</cite>
+                Author of Great Demo!
+              </figcaption>
+            </div>
             <a class="btn magnet spotlight-cta" href="meddic.html">See what Peter saw &rarr;</a>
           </div>
         </figure>
