@@ -115,7 +115,7 @@
     .video-container {
       position: relative;
       width: 100%;
-      padding-top: 65%; /* matches the demo recording (3324×2160) */
+      padding-top: 61.25%; /* matches the thumbnail (712×436) */
       border: 4px solid var(--ink);
       border-radius: 14px;
       overflow: hidden;
@@ -131,36 +131,42 @@
       border: 0;
     }
 
-    .video-placeholder {
+    .video-poster {
       position: absolute;
       inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      color: var(--paper-dark);
-      text-align: center;
-      padding: 2rem;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
     }
 
-    .video-placeholder .play-icon {
-      width: 5rem;
-      height: 5rem;
+    .video-poster img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.3s ease;
+    }
+
+    .video-poster:hover img,
+    .video-poster:focus-visible img { filter: brightness(0.8); }
+
+    .video-poster .play-icon {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 5rem; height: 5rem;
       border-radius: 50%;
-      border: 4px solid var(--paper-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
+      padding-left: 5px;
+      background: #9A6B3F;
+      color: #FDFAF5;
       font-size: 1.8rem;
-      opacity: 0.6;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
     }
 
-    .video-placeholder p {
-      font-weight: 700;
-      font-size: 1rem;
-      opacity: 0.5;
-    }
+    .video-poster:hover .play-icon { transform: translate(-50%, -50%) scale(1.1); }
 
     /* ── divider ── */
     .divider {
@@ -355,8 +361,6 @@
       --night:       #0D0905;
     }
     #particle-canvas { mix-blend-mode: normal; }
-    .video-placeholder { color: var(--ink-mid); }
-    .video-placeholder .play-icon { border-color: rgba(244,239,230,0.35); }
     .problem { color: var(--ink); }
     /* hide default cursor on desktop */
     @media (hover: hover) and (pointer: fine) {
@@ -457,7 +461,10 @@
     <div class="video-wrap">
       <div class="shell">
         <div class="video-container">
-          <iframe src="https://www.youtube.com/embed/vr1Ahwau_PI?rel=0" title="MEDDIC Discovery Tool demo" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <button class="video-poster" type="button" aria-label="Play the MEDDIC Discovery Tool demo">
+            <img src="meddic-thumbnail.jpg" alt="Zac presenting the MEDDIC Discovery Tool workspace">
+            <span class="play-icon" aria-hidden="true">▶</span>
+          </button>
         </div>
       </div>
     </div>
@@ -560,6 +567,18 @@
       });
     }
   })();
+  </script>
+  <script>
+  /* ── demo video: show the thumbnail, load YouTube on click ── */
+  document.querySelector('.video-poster').addEventListener('click', function () {
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube.com/embed/vr1Ahwau_PI?rel=0&autoplay=1';
+    iframe.title = 'MEDDIC Discovery Tool demo';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.allowFullscreen = true;
+    this.replaceWith(iframe);
+  });
   </script>
   <script>
   (function () {
